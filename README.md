@@ -129,7 +129,7 @@ Para garantir a transparência da solução (*Explainable AI - XAI*), foram apli
 * **Feature Importance:** Identificação das variáveis com maior impacto global no modelo.
 * **Valores SHAP (SHapley Additive exPlanations):** Análise do impacto positivo ou negativo de cada variável nas predições individuais do modelo.
 
-![SHAP Values](reports\images\summary_plot.png) 
+![SHAP Values](reports/images/summary_plot.png)
 
 ---
 
