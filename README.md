@@ -46,14 +46,20 @@ Desenvolver um **modelo preditivo supervisionado de classificação** capaz de p
 ---
 
 ## 3. Descrição da Base Utilizada
-A base analítica do projeto é derivada da plataforma Base de Dados, mais especificamente a tabela do indicador de alfabetização da Pesquisa Alfabetiza Brasil, organizada pelo INEP (https://basedosdados.org/dataset/073a39d4-89cf-4068-b1e8-34ed0d9c0b72?table=e1de7a6a-5038-4e81-89f0-a15f2cc12c9b), enriquecida com dados públicos e territoriais.
+A base analítica do projeto é derivada da plataforma Base de Dados, mais especificamente a tabela do indicador de alfabetização da Pesquisa Alfabetiza Brasil, organizada pelo INEP (https://basedosdados.org/dataset/073a39d4-89cf-4068-b1e8-34ed0d9c0b72?table=e1de7a6a-5038-4e81-89f0-a15f2cc12c9b), enriquecida com dados públicos e territoriais. 
 
-* **Variável Alvo (Target):** `[A DEFINIR/CONFIRMAR: ex: status_alfabetizacao (1 - Alfabetizado, 0 - Não Alfabetizado)]`
+* **Variável Alvo (Target):** `alfabetizado_alunos (1 - Alfabetizado, 0 - Não Alfabetizado)]`
 * **Principais Variáveis e Origens:**
-  * **Indicadores Educacionais:** Indicador Criança Alfabetizada, Metas nacionais, estaduais e municipais.
+  * **Indicadores Educacionais:** taxa_alfabetizacao_2023 - Percentual dos alunos avaliados no município que foram considerados, mediante o resultado da avaliação estadual, como alfabetizados.
+  meta_alfabetizacao_2024 - Meta de alfabetização no ano de 2024
+  percentual_participacao_2024 - Percentual de participação no município 
+  Variáveis extraídas do Indicador Criança Alfabetizada, Metas nacionais, estaduais e municipais (INEP).
   * **Variáveis Socioeconômicas e Populacionais:** Dados demográficos e econômicos territoriais.
-  * **Fontes Complementares / Enriquecimento:** 
-    * `[MARCAR QUAIS FORAM UTILIZADAS: Censo Escolar | IBGE | FUNDEB | Atlas do Desenvolvimento Humano | PNAD | Cadastro Único]`
+  indice_analfabetismo_2022 - Taxa de analfabetismo - pessoas com 15 anos ou mais (Atlas DH - Censo). Fonte: Atlas do Desenvolvimento Humano (Censo Demográfico).
+  rendimento_domiciliar_2022 - Rendimento domiciliar per capita médio (SIS/IBGE). Fonte: Síntese de Indicadores Sociais (IBGE).
+  inse_2023 - O INSE é o Indicador de Nível Socioeconômico. Ele serve para medir a realidade de renda e escolaridade das famílias dos estudantes brasileiros. Fonte: INEP.
+  nome_regiao - Nome da Grande Região Brasileira. Fonte: Diretório ligando diversos códigos institucionais de municípios brasileiros: IBGE, Receita Federal, TSE, BCB, regiões, comarcas, região de saúde, etc.
+
 
 ---
 
@@ -71,6 +77,7 @@ tech-challenge-fase3/
 │   └── visualization/     # Scripts para geração de gráficos e relatórios
 ├── reports/               # Documentação técnica e relatórios finais
 │   └── images/            # Imagens, gráficos e esquemas do projeto
+├── .gitattributes         # Regras e comportamentos do repositório Git
 ├── .gitignore             # Arquivos ignorados pelo Git
 ├── README.md              # Documentação principal do projeto
 └── requirements.txt       # Dependências e bibliotecas do projeto
@@ -82,26 +89,26 @@ tech-challenge-fase3/
 A pipeline foi construída utilizando a biblioteca **Scikit-Learn**, integrando pré-processamento e estimadores de forma enxuta para evitar **Data Leakage** e garantir reprodutibilidade.
 
 1. **Análise Exploratória de Dados (EDA):**
-   * Avaliação de distribuições, detecção de outliers e análise de correlação entre variáveis.
+   * Avaliação de variáveis, identificação de dados nulos e análise de correlação entre variáveis.
    * Formulação de hipóteses analíticas sobre as disparidades regionais.
-2. **Divisão dos Dados:**
-   * Separação estrita de conjuntos de Treino, Validação e Teste (com estratificação do target).
-3. **Pré-processamento (Integrado no `Pipeline`):**
-   * **Variáveis Numéricas:** Imputação de valores nulos (ex: `SimpleImputer`) e normalização/padronização (`StandardScaler` / `RobustScaler`).
+2. **Pré-processamento:**
+   * **Divisão dos Dados:** Separação estrita de conjuntos de Treino e Teste (com estratificação do target).
+   * **Variáveis Numéricas:** Imputação de valores nulos e normalização/padronização (`StandardScaler` e `RobustScaler`).
    * **Variáveis Categóricas:** Trancodificação e Encoding (`OneHotEncoder` / `TargetEncoder`).
-4. **Tratamento de Data Leakage:**
-   * O pré-processamento e o ajuste de escala foram aplicados **exclusivamente no conjunto de treino** através de `Pipeline` e `ColumnTransformer`, evitando contaminação dos dados de teste.
-5. **Estratégia de Validação:**
-   * Utilização de **Validação Cruzada Estratificada ($K$-Fold)** para aumento da capacidade de generalização e prevenção de *overfitting*.
+   * ** Seleção de Features:** Features selecionadas através de testes de correlação Spearman e Person para variáveis numéricas e Teste Qui-Quadrado para variáveis categóricas.
+3. **Tratamento de Data Leakage:**
+   * O pré-processamento e o ajuste de escala foram aplicados **exclusivamente no conjunto de treino**, evitando contaminação dos dados de teste.
+4. **Estratégia de Validação:**
+   * diagnósticos de sanidade e interpretabilidade com base na teoria dos jogos cooperativos através da biblioteca **SHAP (SHapley Additive exPlanations)**.
 
 ---
 
 ## 6. Escolha do Algoritmo
 Foram testados e comparados múltiplos algoritmos de classificação.
 
-* **Modelos Avaliados:** `[A DEFINIR PELO GRUPO: ex: Regressão Logística, Random Forest, XGBoost, LightGBM, SVM]`
-* **Modelo Selecionado:** `[A DEFINIR PELO GRUPO]`
-* **Justificativa da Escolha:** `[EXPLICAR O MOTIVO: ex: Melhor trade-off entre capacidade preditiva (F1-Score / ROC-AUC) e interpretabilidade para tomada de decisão pública.]`
+* **Modelos Avaliados:** `Decision Tree, Random Forest e XGBoost`
+* **Modelo Selecionado:** `Random Forest`
+* **Justificativa da Escolha:** `Melhor performance global (AUC de 0,673), evidenciando alta capacidade de acerto estratégico.`
 
 ---
 
@@ -122,22 +129,21 @@ Para garantir a transparência da solução (*Explainable AI - XAI*), foram apli
 * **Feature Importance:** Identificação das variáveis com maior impacto global no modelo.
 * **Valores SHAP (SHapley Additive exPlanations):** Análise do impacto positivo ou negativo de cada variável nas predições individuais do modelo.
 
-![SHAP Values](reports/images/shap_summary.png) *(Substituir pelo gráfico gerado pelo grupo)*
+![SHAP Values](tech-challenge-fase3\reports\images\summary_plot.png) 
 
 ---
 
 ## 9. Insights Encontrados
-`[PREENCHER PELO GRUPO APÓS A ANÁLISE]`
-* **Insight 1:** `[Ex: Municípios com indicador X abaixo do valor Y apresentam risco Z% maior de não atingir as metas de alfabetização.]`
-* **Insight 2:** `[Ex: A variável socioeconômica A possui correlação mais forte com a alfabetização do que o investimento direto B.]`
-* **Insight 3:** `[Ex: Identificação de clusters regionais com comportamento atípico que demandam atenção especial.]`
+* **Poder Preditivo do Histórico Recente:** `Indicadores já monitorados (como taxas recentes, metas de alfabetização e percentual de participação) são os preditores mais fortes do desempenho atual, confirmando que os dados existentes oferecem sinal confiável para acompanhamento contínuo.`
+* **Validação do Contexto Socioeconômico e Regional:** `Variáveis como região, INSE e rendimento domiciliar capturaram coerentemente as desigualdades regionais históricas (com piores índices associados ao Nordeste e melhores às regiões Sul e Sudeste), validando a aderência do modelo à realidade.`
+* **Natureza Multifatorial do Fenômeno:** `Análises de interação (*dependence plots*) demonstraram que o impacto das variáveis é interdependente; metas mais ambiciosas, por exemplo, geram retornos superiores quando combinadas a um contexto socioeconômico mais favorável.`
 
 ---
 
 ## 10. Limitações do Projeto
-* **Disponibilidade Temporal:** `[Ex: Defasagem temporal de certas bases públicas socioeconômicas (ex: Censo).]`
-* **Qualidade/Incompletude de Dados:** `[Ex: Ocorrência de subnotificação ou dados faltantes em determinados municípios menores.]`
-* **Escopo do Modelo:** `[Ex: O modelo prevê riscos com base em dados agregados e institucionais, sem considerar fatores subjetivos ou individuais intrapessoais do aluno.]`
+* **Disponibilidade Temporal:** `Defasagem temporal de certas bases públicas socioeconômicas (ex: Censo).`
+* **Qualidade/Incompletude de Dados:** `Poucos dados relativos aos alunos, o que inviabiliza um modelo mais preciso, já que, dentro do contexto de um município e até mesmo de uma escola, pode existir perfis diferentes de alunos, que ajudaria a explicar melhor o fato de ser ou não alfabetizado. Além disso, há ocorrência de subnotificação ou dados faltantes em determinados municípios menores.`
+* **Escopo do Modelo:** `O modelo prevê riscos com base em dados agregados e institucionais, sem considerar fatores subjetivos ou individuais intrapessoais do aluno.`
 
 ---
 
@@ -200,11 +206,8 @@ python src/modeling/train.py
 ## 14. Equipe
 Trabalho desenvolvido para o Tech Challenge - Fase 3:
 
-* Nome do Integrante 1 - GitHub | LinkedIn
+* Igor Paganin - GitHub: https://github.com/paganinigor0807 | LinkedIn: https://www.linkedin.com/in/igor-paganin10
 
-* Nome do Integrante 2 - GitHub | LinkedIn
+* Leandro Vieira - GitHub: https://github.com/leleandrinho | LinkedIn: https://www.linkedin.com/in/leandrovieira440
 
-* Nome do Integrante 3 - GitHub | LinkedIn
-
-
-Vídeo Executivo da Apresentação (até 5 min): Link do Vídeo/YouTube
+* Thiago Baience - GitHub: https://github.com/ThiagoBaia1 | LinkedIn: https://www.linkedin.com/in/thiago-baience-765086146
