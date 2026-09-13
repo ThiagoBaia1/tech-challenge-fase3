@@ -48,7 +48,7 @@ Desenvolver um **modelo preditivo supervisionado de classificação** capaz de p
 ## 3. Descrição da Base Utilizada
 A base analítica do projeto é derivada da plataforma Base de Dados, mais especificamente a tabela do indicador de alfabetização da Pesquisa Alfabetiza Brasil, organizada pelo INEP (https://basedosdados.org/dataset/073a39d4-89cf-4068-b1e8-34ed0d9c0b72?table=e1de7a6a-5038-4e81-89f0-a15f2cc12c9b), enriquecida com dados públicos e territoriais. 
 
-* **Variável Alvo (Target):** `alfabetizado_alunos (1 - Alfabetizado, 0 - Não Alfabetizado)]`
+* **Variável Alvo (Target):** `alfabetizado_alunos (1 - Alfabetizado, 0 - Não Alfabetizado)`
 * **Principais Variáveis e Origens:**
   * **Indicadores Educacionais:** taxa_alfabetizacao_2023 - Percentual dos alunos avaliados no município que foram considerados, mediante o resultado da avaliação estadual, como alfabetizados.
   meta_alfabetizacao_2024 - Meta de alfabetização no ano de 2024
@@ -86,7 +86,7 @@ tech-challenge-fase3/
 --- 
 
 ## 5. Etapas de Modelagem & Pipeline
-A pipeline foi construída utilizando a biblioteca **Scikit-Learn**, integrando pré-processamento e estimadores de forma enxuta para evitar **Data Leakage** e garantir reprodutibilidade.
+A etapa de treinamento foi construída utilizando estimadores das bibliotecas Scikit-Learn e XGBoost, executando a busca de hiperparâmetros e a validação cruzada exclusivamente sobre o conjunto de treino para evitar Data Leakage e garantir reprodutibilidade.
 
 1. **Análise Exploratória de Dados (EDA):**
    * Avaliação de variáveis, identificação de dados nulos e análise de correlação entre variáveis.
@@ -99,7 +99,9 @@ A pipeline foi construída utilizando a biblioteca **Scikit-Learn**, integrando 
 3. **Tratamento de Data Leakage:**
    * O pré-processamento e o ajuste de escala foram aplicados **exclusivamente no conjunto de treino**, evitando contaminação dos dados de teste.
 4. **Estratégia de Validação:**
-   * diagnósticos de sanidade e interpretabilidade com base na teoria dos jogos cooperativos através da biblioteca **SHAP (SHapley Additive exPlanations)**.
+   * **Validação Cruzada ($K$-Fold):** Aplicação de $K$-Fold Cross-Validation (com $K=5$ e $K=3$) exclusivamente nos dados de treinamento (`X_train` e `y_train`) para avaliar a capacidade de generalização dos modelos antes e durante o ajuste de hiperparâmetros.
+   * **Otimização de Hiperparâmetros:** Utilização de `GridSearchCV` e `RandomizedSearchCV` integrados à validação cruzada para encontrar a melhor combinação de parâmetros, orientados pela otimização da métrica principal (`F1-Score`).
+   * **Tratamento do Desbalanceamento:** Incorporação de pesos de classe (`class_weight="balanced"` na Decision Tree e Random Forest, e `scale_pos_weight` no XGBoost) durante a validação cruzada para ponderar adequadamente a classe minoritária.
 
 ---
 
@@ -108,7 +110,7 @@ Foram testados e comparados múltiplos algoritmos de classificação.
 
 * **Modelos Avaliados:** `Decision Tree, Random Forest e XGBoost`
 * **Modelo Selecionado:** `Random Forest`
-* **Justificativa da Escolha:** `Melhor performance global (AUC de 0,673), evidenciando alta capacidade de acerto estratégico.`
+* **Justificativa da Escolha:** `Melhor performance global (AUC de 0.673), evidenciando alta capacidade de acerto estratégico.`
 
 ---
 
@@ -174,7 +176,7 @@ A solução analítica desenvolvida serve como ferramenta estratégica para gest
 
 1. **Clonar o repositório:**
    ```bash
-   git clone [https://github.com/SEU-USUARIO/tech-challenge-fase3.git](https://github.com/SEU-USUARIO/tech-challenge-fase3.git)
+   git clone (https://github.com/leleandrinho/tech-challenge-fase3.git)
    cd tech-challenge-fase3
    ```
 
@@ -199,7 +201,7 @@ pip install -r requirements.txt
 4. **Executar a Pipeline de Modelagem:**
 
 ```Bash
-python src/modeling/train.py
+python src/modeling/modeling.py
 ```
 ---
 
