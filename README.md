@@ -117,9 +117,9 @@ O projeto avaliou os modelos utilizando métricas alinhadas com o problema de ne
 
 | Modelo | Acurácia | Precisão | Recall | F1-Score | ROC-AUC |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| Modelo Baseline | `[0.XX]` | `[0.XX]` | `[0.XX]` | `[0.XX]` | `[0.XX]` |
-| Modelo X | `[0.XX]` | `[0.XX]` | `[0.XX]` | `[0.XX]` | `[0.XX]` |
-| **Modelo Final (`[Nome]`)** | **`[0.XX]`** | **`[0.XX]`** | **`[0.XX]`** | **`[0.XX]`** | **`[0.XX]`** |
+| Modelo Decision Tree | `0.604824` | `0.603664` | `0.729182` | `0.660513` | `0.637538` |
+| Modelo XGBoost | `0.620393` | `0.651718	` | `0.601321` | `0.625506` | `0.670769` |
+| **Modelo Final (`Random Forest`)** | **`0.621901`** | **`0.652949`** | **`0.603709`** | **`0.627364`** | **`0.672655`** |
 
 ---
 
